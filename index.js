@@ -12,16 +12,15 @@ const app = express();
 //CONFIGURAR CORS (MIDDLEWARE) EJECUTA SIEMPRE ANTES DE CUALQUIER OTRA
 app.use(cors());
 
+//LECTURA Y PARSEO DEL BODY
+app.use(express.json());
+
 //DATABASE
 dbConnection();
 
 //RUTAS
-app.get('/', (req, res) => {
-    res.json({
-        ok: true,
-        msg: 'hola mundo 2'
-    })
-});
+app.use('/api/usuarios', require('./routes/usuarios'));
+app.use('/api/login', require('./routes/auth'));
 
 //SERVER RUN
 app.listen(process.env.PORT, () => {
