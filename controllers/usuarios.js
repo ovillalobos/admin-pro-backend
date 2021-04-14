@@ -4,15 +4,37 @@ const bcrypt = require('bcryptjs');
 const Usuario = require('../models/usuario');
 const { generarJWT } = require('../helpers/jwt');
 
-const getUsuarios = async(req, res) => {
-    const usuarios = await Usuario.find({}, 'nombre email role google');
+const getUsuarios = async(req, res = response) => {
+    try {
+        const desde = Number(req.query.desde) || 0; // En caso de venir vacio poner 0
+        const limit = Number(req.query.limit) || 5; // En caso de venir vacio poner 5
+        /*
+        const usuarios = await Usuario.find({}, 'nombre email role google')
+            .skip(desde)
+            .limit(5);
 
-    res.json({
-        status: true,
-        msg: 'Registros encontrados correctamente',
-        usuarios,
-        uid: req.uid //Se recupera del Middleware validar-JWT
-    })
+        const total = await Usuario.count();
+        */
+
+        const [usuarios, total] = await Promise.all([
+            Usuario.find({}, 'nombre email role google img').skip(desde).limit(limit),
+            Usuario.count()
+        ])
+
+        res.json({
+            status: true,
+            msg: 'Registros encontrados correctamente',
+            usuarios,
+            total: total,
+            uid: req.uid //Se recupera del Middleware validar-JWT
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: false,
+            msg: 'Error inesperado... revisar logs'
+        })
+    }
 }
 
 const crearUsuario = async(req, res = response) => {

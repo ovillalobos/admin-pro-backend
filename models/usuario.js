@@ -28,7 +28,7 @@ const UsuarioSchema = Schema({
     },
 });
 
-//Configurando el Schema
+//CONFIGURACION DE SCHEMA
 UsuarioSchema.method('toJSON', function() {
     const { __v, _id, password, ...object } = this.toObject(); //Extraccion
 

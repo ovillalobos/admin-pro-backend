@@ -1,4 +1,5 @@
 /*
+FILE: USUARIOS
 PATH: /api/usuarios
 */
 const { Router } = require('express');
