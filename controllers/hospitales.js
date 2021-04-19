@@ -47,10 +47,30 @@ const crearHospital = async(req, res = response) => {
 }
 
 const actualizarHospital = async(req, res = response) => {
+    const hospitalID = req.params.id;
+    const userID = req.uid; //Lo obtenemos del JWT
+
     try {
-        res.json({
+        const hospital = await Hospital.findById(hospitalID);
+
+        if (!hospital) {
+            return res.status(400).json({
+                status: true,
+                msg: 'No se encontro el registro por ID'
+            });
+        }
+
+        const cambiosHospital = {
+            ...req.body,
+            usuario: userID
+        }
+
+        const hospitalActualizado = await Hospital.findByIdAndUpdate(hospitalID, cambiosHospital, { new: true });
+
+        res.status(200).json({
             status: true,
-            msg: 'actualizarHospital'
+            msg: 'El registro se ha actualizado correctamente',
+            hospital: hospitalActualizado
         });
     } catch (error) {
         console.log(error);
@@ -62,10 +82,23 @@ const actualizarHospital = async(req, res = response) => {
 }
 
 const borrarHospital = async(req, res = response) => {
+    const hospitalID = req.params.id;
+
     try {
-        res.json({
+        const hospital = await Hospital.findById(hospitalID);
+
+        if (!hospital) {
+            return res.status(400).json({
+                status: true,
+                msg: 'No se encontro el registro por ID'
+            });
+        }
+
+        const hospitalEliminado = await Hospital.findOneAndDelete(hospitalID);
+
+        res.status(200).json({
             status: true,
-            msg: 'borrarHospital'
+            msg: 'El registro se ha eliminado correctamente'
         });
     } catch (error) {
         console.log(error);

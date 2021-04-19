@@ -1,6 +1,7 @@
 const { response } = require('express');
 
 const Medico = require('../models/medico');
+const Hospital = require('../models/hospital');
 
 const getMedicos = async(req, res = response) => {
     try {
@@ -48,10 +49,39 @@ const crearMedico = async(req, res = response) => {
 }
 
 const actualizarMedico = async(req, res = response) => {
+    const medicoID = req.params.id;
+    const hospitalID = req.body.hospital;
+    const userID = req.uid;
+
     try {
-        res.json({
+        const medico = await Medico.findById(medicoID);
+        const hospital = await Hospital.findById(hospitalID);
+
+        if (!medico) {
+            return res.status(400).json({
+                status: true,
+                msg: 'No se encontro el registro por ID'
+            });
+        }
+
+        if (!hospital) {
+            return res.status(400).json({
+                status: true,
+                msg: 'No se encontro el registro por ID'
+            });
+        }
+
+        const cambiosMedico = {
+            ...req.body,
+            usuario: userID
+        }
+
+        const medicoActualizado = await Medico.findByIdAndUpdate(medicoID, cambiosMedico, { new: true });
+
+        res.status(200).json({
             status: true,
-            msg: 'actualizarMedico'
+            msg: 'El registro se ha actualizado correctamente',
+            medico: medicoActualizado
         });
     } catch (error) {
         console.log(error);
@@ -63,10 +93,23 @@ const actualizarMedico = async(req, res = response) => {
 }
 
 const borrarMedicos = async(req, res = response) => {
+    const medicoID = req.params.id;
+
     try {
-        res.json({
+        const medico = await Medico.findById(medicoID);
+
+        if (!medico) {
+            return res.status(400).json({
+                status: true,
+                msg: 'No se encontro el registro por ID'
+            });
+        }
+
+        const medicoEliminado = await Medico.findOneAndDelete(medicoID);
+
+        res.status(200).json({
             status: true,
-            msg: 'borrarMedicos'
+            msg: 'El registro se ha eliminado correctamente'
         });
     } catch (error) {
         console.log(error);

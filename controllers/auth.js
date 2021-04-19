@@ -6,7 +6,7 @@ const Usuario = require('../models/usuario');
 const { generarJWT } = require('../helpers/jwt');
 const { googleVerify } = require('../helpers/google-verify');
 
-const login = async(req, res) => {
+const login = async(req, res = response) => {
     const { email, password } = req.body;
 
     try {
@@ -48,7 +48,7 @@ const login = async(req, res) => {
     }
 }
 
-const googleSignIn = async(req, res) => {
+const googleSignIn = async(req, res = response) => {
     try {
         const googleToken = req.body.token;
         const { name, email, picture } = await googleVerify(googleToken);
@@ -78,7 +78,7 @@ const googleSignIn = async(req, res) => {
 
         res.json({
             status: true,
-            msg: 'Login',
+            msg: 'Google Sign-In',
             token
         });
     } catch (error) {
@@ -90,7 +90,28 @@ const googleSignIn = async(req, res) => {
     }
 }
 
+const renewToken = async(req, res = response) => {
+    try {
+        const uid = req.uid;
+
+        //GENERAR TOKEN - JWT
+        const token = await generarJWT(uid);
+
+        res.status(200).json({
+            status: true,
+            msg: 'renewToken',
+            token
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: false,
+            msg: 'Token no valido'
+        });
+    }
+}
 module.exports = {
     login,
-    googleSignIn
+    googleSignIn,
+    renewToken
 }
