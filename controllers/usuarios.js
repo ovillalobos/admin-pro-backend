@@ -83,11 +83,10 @@ const actualizarUsuario = async(req, res = response) => {
     const uid = req.params.id; //PARAMETROS URL GET
 
     try {
-
         const usuarioDB = await Usuario.findById(uid);
 
         if (!usuarioDB) {
-            res.status(400).json({
+            return res.status(400).json({
                 status: false,
                 msg: 'No se encontro el registro con el ID ' + uid
             })
@@ -110,7 +109,15 @@ const actualizarUsuario = async(req, res = response) => {
         // SIN EXTRACCION delete campos.password;
         // SIN EXTRACCION delete campos.google;
 
-        campos.email = email;
+        if (!usuarioDB.google) {
+            campos.email = email;
+        } else if (usuarioDB.email !== email) {
+            return res.status(400).json({
+                status: false,
+                msg: 'Los usuarios de Google no pueden cambiar su correo electronico'
+            })
+        }
+
         const usuarioActualizado = await Usuario.findByIdAndUpdate(uid, campos, { new: true });
 
         res.json({
