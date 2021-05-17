@@ -94,7 +94,7 @@ const borrarHospital = async(req, res = response) => {
             });
         }
 
-        const hospitalEliminado = await Hospital.findOneAndDelete(hospitalID);
+        const hospitalEliminado = await Hospital.findByIdAndDelete(hospitalID);
 
         res.status(200).json({
             status: true,

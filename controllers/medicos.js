@@ -7,13 +7,49 @@ const getMedicos = async(req, res = response) => {
     try {
         const medicos = await Medico.find()
             .populate('usuario', 'nombre email img')
-            .populate('hospital', 'nombre');
+            .populate('hospital', 'nombre img');
 
-        res.json({
-            status: true,
-            msg: 'La consulta se realizo correctamente',
-            medicos
-        });
+        if (medicos) {
+            res.json({
+                status: true,
+                msg: 'La consulta se realizo correctamente',
+                medicos
+            });
+        } else {
+            res.json({
+                status: false,
+                msg: 'No se encontro ningun registro'
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: false,
+            msg: 'Error inesperado... revisar logs'
+        })
+    }
+}
+
+const getMedicoByID = async(req, res = response) => {
+    const medicoID = req.params.id;
+
+    try {
+        const medicos = await Medico.findById(medicoID)
+            .populate('usuario', 'nombre email img')
+            .populate('hospital', 'nombre img');
+
+        if (medicos) {
+            res.json({
+                status: true,
+                msg: 'La consulta se realizo correctamente',
+                medicos
+            });
+        } else {
+            res.json({
+                status: false,
+                msg: 'No se encontro ningun registro'
+            });
+        }
     } catch (error) {
         console.log(error);
         res.status(500).json({
@@ -105,7 +141,7 @@ const borrarMedicos = async(req, res = response) => {
             });
         }
 
-        const medicoEliminado = await Medico.findOneAndDelete(medicoID);
+        const medicoEliminado = await Medico.findByIdAndDelete(medicoID);
 
         res.status(200).json({
             status: true,
@@ -122,6 +158,7 @@ const borrarMedicos = async(req, res = response) => {
 
 module.exports = {
     getMedicos,
+    getMedicoByID,
     crearMedico,
     actualizarMedico,
     borrarMedicos
