@@ -5,7 +5,7 @@ PATH: /api/usuarios
 const { Router } = require('express');
 const { check } = require('express-validator');
 const { validarCampos } = require('../middlewares/validar-campos');
-const { validarJWT } = require('../middlewares/validar-jwt');
+const { validarJWT, validarADMIN_ROLE, validarADMIN_ROLE_MISMO_USUARIO } = require('../middlewares/validar-jwt');
 
 const { getUsuarios, crearUsuario, actualizarUsuario, borrarUsuario } = require('../controllers/usuarios');
 
@@ -27,6 +27,7 @@ router.post('/', [
 //Adding middleware
 router.put('/:id', [
         validarJWT,
+        validarADMIN_ROLE_MISMO_USUARIO,
         check('nombre', 'El nombre es obligatorio').not().isEmpty(),
         check('email', 'El email es obligatorio').not().isEmpty(),
         check('email', 'El formato del correo no es correcto').isEmail(),
@@ -36,6 +37,9 @@ router.put('/:id', [
     actualizarUsuario
 );
 
-router.delete('/:id', [validarJWT], borrarUsuario);
+router.delete('/:id', [
+    validarJWT,
+    validarADMIN_ROLE
+], borrarUsuario);
 
 module.exports = router;
